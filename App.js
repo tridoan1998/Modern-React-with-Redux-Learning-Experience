@@ -1,17 +1,30 @@
-import {ChatEngine} from 'react-chat-engine';
-import './App.css';
-import ChatFeed from './components/ChatFeed';
-const App = () => {
-    return (
-        < ChatEngine
-            height = "100"
-            projectID = "8c193b84-ba08-48bc-a887-79cafdbf99d1"
-            userName= "javascriptmastery"
-            userSecret = "123123"
-            renderChatFeed = {(chatAppProps)=> <ChatFeed { ... chatAppProps } />}
-        />
-    )
+import React from 'react';
+import unsplash from '../api/unsplash';
+import SearchBar from './SearchBar';
+import ImageList from './ImageList';
 
-}
+class App extends React.Component {
+    state = { images: [] };
 
-export default App; 
+    
+    onSearchSubmit = async (term) => {
+        const response = await unsplash.get('https://api.unsplash.com/search/photos', {
+            params: { query: term}
+        });
+
+        this.setState({images: response.data.results});
+
+    }
+
+
+    render() {
+    return(
+    <div className="ui container" style={{marginTop: '10px'}}>
+        <SearchBar onSubmit={this.onSearchSubmit}/>
+        <ImageList images ={this.state.images}/>
+        </div>
+    );
+    }
+};
+
+export default App;
