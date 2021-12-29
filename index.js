@@ -1,19 +1,46 @@
-import streams from '../apis/streams';
-import { SIGN_IN, SIGN_OUT } from './types';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import SeasonDisplay from './SeasonDisplay';
+import Spinner from './Spinner';
 
-export const signIn = userId => {
-  return {
-    type: SIGN_IN,
-    payload: userId
-  };
-};
+class App extends React.Component {
 
-export const signOut = () => {
-  return {
-    type: SIGN_OUT
-  };
-};
+    state = {lat: null, errorMessage: ''};
 
-export const createStream = formValues => async dispatch => {
-  streams.post('/streams', formValues);
-};
+    componentDidMount() {
+        window.navigator.geolocation.getCurrentPosition(
+            position => this.setState({ lat: position.coords.latitude}),
+            err => this.setState({errotMessage: err.message})
+            );
+    }
+    
+
+    renderContent() {
+        if (this.state.errorMessage && !this.state.lat){
+            return <div> Error {this.state.errorMessage} </div>;
+
+        }
+
+        if (!this.state.errorMessage && this.state.lat) {
+            return <SeasonDisplay lat={this.state.lat}/>
+        }
+
+        return <Spinner message="Please accept location request"/>;
+
+    }
+    //react need render!
+    render(){
+        return (
+            <div className="border ed">
+                {this.renderContent()}
+            </div>
+        )
+
+        }
+}
+
+ReactDOM.render(
+    <App />,
+    document.querySelector('#root')
+
+);
